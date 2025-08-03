@@ -1,0 +1,39 @@
+@import url("https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap");
+@import "tailwindcss";
+
+:root {
+  --black-color: #000000;
+  --white-color: #ffffff;
+  --light-white-color: rgba(255, 255, 255, 0.5);
+  --primary-color: #c944d0;
+}
+
+.responsive-heading {
+  @apply text-2xl leading-8;
+  @apply md:text-4xl md:leading-[3.5rem];
+}
+.responsive-paragraph {
+  @apply text-base leading-7;
+  @apply md:text-lg md:leading-8;
+}
+
+.section-container {
+  @apply py-10 px-5 md:px-10 md:py-15 lg:p-20;
+}
+
+* {
+  box-sizing: border-box;
+  font-family: "Poppins", "Roboto", sans-serif;
+  font-optical-sizing: auto;
+}
+
+body {
+  background: var(--black-color);
+}
+
+.custom-select .ant-select-selector {
+  @apply !bg-white/15 !text-white;
+}
+.custom-select-bf .ant-select-selector {
+  @apply !bg-black/5 !border-white/50 !text-white;
+}
