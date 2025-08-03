@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import Button from "../common/Button";
 import Container from "../common/Container";
-import { NavLink } from "react-router";
+import { Link, NavLink } from "react-router";
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -10,7 +10,7 @@ const Header = () => {
     { label: "Gallery", path: "/gallery" },
     { label: "About Us", path: "/about" },
     { label: "Advance Booking", path: "/booking" },
-    { label: "Terms&18+ Disclaimer Page", path: "/disclaimer" },
+    { label: "Terms & 18+ Disclaimer Page", path: "/disclaimer" },
   ];
   return (
     <div className="bg-[var(--primary-color)]">
@@ -31,7 +31,9 @@ const Header = () => {
             </div>
 
             {/* Logo */}
-            <p className="text-3xl text-white font-black mb-2">Logo</p>
+            <Link to={"/"}>
+              <img src="./website_logo.PNG" className="w-14 mb-1" />
+            </Link>
           </div>
 
           {/* Nav Items (desktop) */}

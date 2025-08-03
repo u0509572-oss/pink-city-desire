@@ -43,41 +43,6 @@ const data = [
   },
 ];
 
-const dataSource = [
-  {
-    key: "1",
-    title: "Russian Call Girl Jaipur",
-    rate1: "₹ 5000",
-    rate2: "₹ 12000",
-    rate3: "₹ 25000",
-    cta: <Button children={"Book Now"} className="!py-1.5"></Button>,
-  },
-  {
-    key: "2",
-    title: "Russian Call Girl Jaipur",
-    rate1: "₹ 5000",
-    rate2: "₹ 12000",
-    rate3: "₹ 25000",
-    cta: <Button children={"Book Now"} className="!py-1.5"></Button>,
-  },
-  {
-    key: "3",
-    title: "Russian Call Girl Jaipur",
-    rate1: "₹ 5000",
-    rate2: "₹ 12000",
-    rate3: "₹ 25000",
-    cta: <Button children={"Book Now"} className="!py-1.5"></Button>,
-  },
-  {
-    key: "4",
-    title: "Russian Call Girl Jaipur",
-    rate1: "₹ 5000",
-    rate2: "₹ 12000",
-    rate3: "₹ 25000",
-    cta: <Button children={"Book Now"} className="!py-1.5"></Button>,
-  },
-];
-
 const columns = [
   {
     title: "Jaipur Call Girl Near Me",
@@ -113,6 +78,72 @@ const columns = [
 
 const Home = () => {
   const navigate = useNavigate();
+  const dataSource = [
+    {
+      key: "1",
+      title: "Russian Call Girl Jaipur",
+      rate1: "₹ 5000",
+      rate2: "₹ 12000",
+      rate3: "₹ 25000",
+      cta: (
+        <Button
+          children={"Book Now"}
+          onClick={() => {
+            navigate("/booking");
+          }}
+          className="!py-1.5"
+        ></Button>
+      ),
+    },
+    {
+      key: "2",
+      title: "Russian Call Girl Jaipur",
+      rate1: "₹ 5000",
+      rate2: "₹ 12000",
+      rate3: "₹ 25000",
+      cta: (
+        <Button
+          children={"Book Now"}
+          onClick={() => {
+            navigate("/booking");
+          }}
+          className="!py-1.5"
+        ></Button>
+      ),
+    },
+    {
+      key: "3",
+      title: "Russian Call Girl Jaipur",
+      rate1: "₹ 5000",
+      rate2: "₹ 12000",
+      rate3: "₹ 25000",
+      cta: (
+        <Button
+          children={"Book Now"}
+          onClick={() => {
+            navigate("/booking");
+          }}
+          className="!py-1.5"
+        ></Button>
+      ),
+    },
+    {
+      key: "4",
+      title: "Russian Call Girl Jaipur",
+      rate1: "₹ 5000",
+      rate2: "₹ 12000",
+      rate3: "₹ 25000",
+      cta: (
+        <Button
+          children={"Book Now"}
+          onClick={() => {
+            navigate("/booking");
+          }}
+          className="!py-1.5"
+        ></Button>
+      ),
+    },
+  ];
   return (
     <section>
       {/* Landing Section */}

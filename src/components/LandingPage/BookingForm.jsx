@@ -1,6 +1,12 @@
 import { Col, DatePicker, Form, Input, Row, Select } from "antd";
-import moment from "moment";
+import dayjs from "dayjs"; // Use dayjs instead of moment
 import Button from "../common/Button";
+import { addDoc, collection } from "firebase/firestore";
+
+import toast from "react-hot-toast";
+import { useState, useCallback } from "react";
+import { FaSpinner } from "react-icons/fa";
+import { db } from "../../Firebase";
 
 const { Option } = Select;
 
@@ -9,13 +15,44 @@ const BookingForm = ({
   labelStyle = {},
 }) => {
   const [form] = Form.useForm();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [selectedDateTime, setSelectedDateTime] = useState(null);
 
-  const onFinish = (values) => {
-    console.log("Form Submitted:", {
-      ...values,
-      dateTime: values.dateTime?.format("YYYY-MM-DD HH:mm"),
-    });
+  const onFinish = async (values) => {
+    setIsSubmitting(true);
+
+    try {
+      const bookingData = {
+        ...values,
+        dateTime: values.dateTime?.format("YYYY-MM-DD HH:mm"),
+        createdAt: new Date().toISOString(),
+        status: "Pending" 
+      };
+
+      // Add document to Firestore
+      await addDoc(collection(db, "bookings"), bookingData);
+
+      toast.success("Booking submitted successfully!");
+      form.resetFields();
+      setSelectedDateTime(null); // Reset local state
+    } catch (error) {
+      console.error("Error submitting booking:", error);
+      toast.error("Failed to submit booking. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
+
+  // Memoized date change handler to prevent re-renders
+  const handleDateTimeChange = useCallback((date) => {
+    setSelectedDateTime(date);
+    // Don't call form.setFieldsValue here to avoid conflicts
+  }, []);
+
+  // Function to disable past dates
+  const disabledDate = useCallback((current) => {
+    return current && current < dayjs().startOf('day');
+  }, []);
 
   return (
     <div>
@@ -26,8 +63,9 @@ const BookingForm = ({
         initialValues={{
           location: "Delhi",
           companion: "Alone",
-          dateTime: moment(),
+          // No initial dateTime value
         }}
+        preserve={false} // Don't preserve field values on unmount
       >
         <Row gutter={24}>
           <Col xs={24} md={12}>
@@ -136,19 +174,50 @@ const BookingForm = ({
               ]}
             >
               <DatePicker
-                showTime
-                style={{ width: "100%" }}
-                className={inputStyle}
+                showTime={{
+                  format: 'HH:mm',
+                  use12Hours: false,
+                  hideDisabledOptions: true,
+                }}
+                style={{ 
+                  width: "100%",
+                }}
+                // Remove custom className that might conflict
+                 className={inputStyle}
                 format="YYYY-MM-DD HH:mm"
+                placeholder="Select date and time"
+                disabledDate={disabledDate}
+                onChange={handleDateTimeChange}
+                value={selectedDateTime}              
+                allowClear
+                autoFocus={false}
+                open={undefined} // Let DatePicker manage its own open state
               />
             </Form.Item>
           </Col>
         </Row>
 
         <Form.Item>
-          <Button children={"Book Now"} type="submit" className="w-full mt-5" />
+          <Button 
+            children={
+              isSubmitting ? (
+                <span className="flex items-center justify-center gap-2">
+                  <FaSpinner className="animate-spin" />
+                  Processing...
+                </span>
+              ) : (
+                "Book Now"
+              )
+            } 
+            type="submit" 
+            className="w-full mt-5"
+            disabled={isSubmitting}
+          />
         </Form.Item>
       </Form>
+
+      {/* Add this CSS to override any conflicting styles */}
+
     </div>
   );
 };

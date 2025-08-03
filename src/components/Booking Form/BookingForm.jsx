@@ -1,11 +1,16 @@
 import { Checkbox, Col, DatePicker, Form, Input, Row, Select } from "antd";
+import { useState } from "react";
+import toast from "react-hot-toast";
+import { FaSpinner } from "react-icons/fa";
 import moment from "moment";
 import Button from "../common/Button";
+import { db } from "../../Firebase";
+import { addDoc, collection } from "firebase/firestore";
 
 const { Option } = Select;
 
 const locations = ["Delhi", "Mumbai", "Bangalore", "Chennai"];
-const hourOptions = ["1hr", "2hrs", "full-night"];
+const hourOptions = ["2hr", "4hrs", "full-night"];
 const companions = ["Alone", "Friend", "Family", "Partner"];
 
 const BookingForm = ({
@@ -13,12 +18,30 @@ const BookingForm = ({
   labelStyle = {},
 }) => {
   const [form] = Form.useForm();
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const onFinish = (values) => {
-    console.log("Form Submitted:", {
-      ...values,
-      dateTime: values.dateTime?.format("YYYY-MM-DD HH:mm"),
-    });
+  const onFinish = async (values) => {
+    setIsSubmitting(true);
+
+    try {
+      const bookingData = {
+        ...values,
+        dateTime: values.dateTime?.format("YYYY-MM-DD HH:mm"),
+        createdAt: new Date().toISOString(),
+        status: "Pending",
+      };
+
+      // Add document to Firestore
+      await addDoc(collection(db, "bookings"), bookingData);
+
+      toast.success("Booking submitted successfully!");
+      form.resetFields();
+    } catch (error) {
+      console.error("Error submitting booking:", error);
+      toast.error("Failed to submit booking. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -30,7 +53,7 @@ const BookingForm = ({
         initialValues={{
           location: "Delhi",
           companion: "Alone",
-          dateTime: moment(),
+          // Remove moment() from initial values - let it be undefined initially
         }}
       >
         <Row gutter={24} className="gap-y-2">
@@ -82,10 +105,46 @@ const BookingForm = ({
               ]}
             >
               <DatePicker
-                showTime
+                showTime={{
+                  format: "HH:mm",
+                  minuteStep: 15, // Optional: step by 15 minutes
+                }}
                 style={{ width: "100%" }}
                 className={inputStyle}
                 format="YYYY-MM-DD HH:mm"
+                placeholder="Select date and time"
+                disabledDate={(current) => {
+                  // Disable past dates
+                  return current && current < moment().startOf("day");
+                }}
+                disabledTime={(current) => {
+                  // If today is selected, disable past hours
+                  if (current && current.isSame(moment(), "day")) {
+                    const currentHour = moment().hour();
+                    const currentMinute = moment().minute();
+
+                    return {
+                      disabledHours: () => {
+                        const hours = [];
+                        for (let i = 0; i < currentHour; i++) {
+                          hours.push(i);
+                        }
+                        return hours;
+                      },
+                      disabledMinutes: (selectedHour) => {
+                        if (selectedHour === currentHour) {
+                          const minutes = [];
+                          for (let i = 0; i <= currentMinute; i++) {
+                            minutes.push(i);
+                          }
+                          return minutes;
+                        }
+                        return [];
+                      },
+                    };
+                  }
+                  return {};
+                }}
               />
             </Form.Item>
           </Col>
@@ -343,11 +402,21 @@ const BookingForm = ({
             <Form.Item>
               <div className="w-full flex justify-end">
                 <Button
-                  children={"Book Now"}
+                  children={
+                    isSubmitting ? (
+                      <span className="flex items-center gap-2">
+                        <FaSpinner className="animate-spin" />
+                        Processing...
+                      </span>
+                    ) : (
+                      "Book Now"
+                    )
+                  }
                   type="submit"
                   bgColor="bg-[#4BFFFF]"
                   textColor="text-[var(--black-color)]"
                   className="!px-30"
+                  disabled={isSubmitting}
                 />
               </div>
             </Form.Item>
