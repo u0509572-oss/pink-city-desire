@@ -268,7 +268,6 @@ const GirlsProfiles = () => {
     },
   ];
 
-  // Pagination
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentItems = filteredProfiles.slice(
