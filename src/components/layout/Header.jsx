@@ -1,10 +1,14 @@
-import React, { useState } from "react";
+import  { useState } from "react";
 import Button from "../common/Button";
 import Container from "../common/Container";
-import { Link, NavLink } from "react-router";
+import { Link, NavLink, useNavigate } from "react-router";
+import { useAuth } from "../../contexts/AuthContext";
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { isAdmin } = useAuth();
+  const navigate = useNavigate();
+  
   const navItems = [
     { label: "Home", path: "/" },
     { label: "Gallery", path: "/gallery" },
@@ -12,6 +16,15 @@ const Header = () => {
     { label: "Advance Booking", path: "/booking" },
     { label: "Terms & 18+ Disclaimer Page", path: "/disclaimer" },
   ];
+
+  const handleAdminAction = () => {
+    if (isAdmin) {
+      navigate("admin/bookings");
+    } else {
+      navigate("/login");
+    }
+  };
+
   return (
     <div className="bg-[var(--primary-color)]">
       <Container>
@@ -32,12 +45,12 @@ const Header = () => {
 
             {/* Logo */}
             <Link to={"/"}>
-              <img src="./website_logo.PNG" className="w-14 mb-1" />
+              <img src="./website_logo.PNG" className="w-14 mb-1" alt="Website Logo" />
             </Link>
           </div>
 
           {/* Nav Items (desktop) */}
-          <div className=" hidden lg:flex space-x-0.5 list-none">
+          <div className="hidden lg:flex space-x-0.5 list-none">
             {navItems.map((item) => (
               <NavLink
                 key={item.path}
@@ -56,11 +69,20 @@ const Header = () => {
             ))}
           </div>
 
-          <Button
-            children={"Contact Us"}
-            bgColor="bg-[var(--black-color)]"
-            className="mb-2"
-          />
+          <div className="flex gap-2">
+            <Button
+              children={"Contact Us"}
+              bgColor="bg-[var(--black-color)]"
+              className="mb-2"
+            />
+            <Button
+              children={isAdmin ? "Dashboard" : "Admin Login"}
+              bgColor="bg-[var(--black-color)]"
+              className="mb-2"
+              onClick={handleAdminAction}
+            />
+          </div>
+
           {/* Mobile Menu */}
           {isMenuOpen && (
             <div className="absolute top-full left-0 w-full bg-[var(--primary-color)] flex flex-col lg:hidden shadow-md z-10">

@@ -26,7 +26,7 @@ const BookingForm = ({
         ...values,
         dateTime: values.dateTime?.format("YYYY-MM-DD HH:mm"),
         createdAt: new Date().toISOString(),
-        status: "Pending" 
+        status: "pending" 
       };
 
       // Add document to Firestore
@@ -73,7 +73,7 @@ const BookingForm = ({
               label={
                 <span style={{ color: "white", ...labelStyle }}>Full Name</span>
               }
-              name="fullname"
+              name="fullName"
               rules={[
                 { required: true, message: "Please enter your full name" },
               ]}

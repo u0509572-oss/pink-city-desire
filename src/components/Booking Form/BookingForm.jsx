@@ -28,7 +28,7 @@ const BookingForm = ({
         ...values,
         dateTime: values.dateTime?.format("YYYY-MM-DD HH:mm"),
         createdAt: new Date().toISOString(),
-        status: "Pending",
+        status: "pending",
       };
 
       // Add document to Firestore
@@ -62,7 +62,7 @@ const BookingForm = ({
               label={
                 <span style={{ color: "white", ...labelStyle }}>Name</span>
               }
-              name="fullname"
+              name="fullName"
               rules={[{ required: true, message: "Please enter your name" }]}
             >
               <Input className={inputStyle} />
@@ -189,7 +189,7 @@ const BookingForm = ({
                   Whatsapp number
                 </span>
               }
-              name="wno"
+              name="whatsapp"
               rules={[
                 {
                   required: true,
@@ -212,7 +212,7 @@ const BookingForm = ({
                   Select hours
                 </span>
               }
-              name="hours"
+              name="hoursBooked"
               rules={[{ required: true, message: "Please select hours" }]}
             >
               <Select
@@ -262,7 +262,7 @@ const BookingForm = ({
                       Would you like to receive a photo on WhatsApp?
                     </span>
                   }
-                  name="wrecieve"
+                  name="whatsappRecieve"
                   rules={[
                     { required: true, message: "Please select an option" },
                   ]}
@@ -299,7 +299,7 @@ const BookingForm = ({
                       Hotel preference
                     </span>
                   }
-                  name="hotel"
+                  name="hotelRequired"
                   rules={[
                     { required: true, message: "Please select an option" },
                   ]}
@@ -334,7 +334,7 @@ const BookingForm = ({
                       Cab preference
                     </span>
                   }
-                  name="cab"
+                  name="cabRequired"
                   rules={[
                     { required: true, message: "Please select an option" },
                   ]}
@@ -367,7 +367,7 @@ const BookingForm = ({
                   Pickup Addresses
                 </span>
               }
-              name="pickup"
+              name="pickupAddress"
               rules={[
                 { required: true, message: "Please enter pickup address" },
               ]}
@@ -378,7 +378,7 @@ const BookingForm = ({
 
           <Col xs={24} md={12}>
             <Form.Item
-              name="agreement"
+              name="ageConfirmation"
               valuePropName="checked"
               rules={[
                 {
