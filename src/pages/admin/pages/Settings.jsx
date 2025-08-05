@@ -19,6 +19,12 @@ const Settings = () => {
     logoPreview: "",
     contactNumber1: "",
     contactNumber2: "",
+    email: "",
+    address: "",
+    facebookUrl: "",
+    twitterUrl: "",
+    instagramUrl: "",
+    openingHours: "",
   });
 
   const [passwordData, setPasswordData] = useState({
@@ -29,7 +35,6 @@ const Settings = () => {
 
   const [websiteLoading, setWebsiteLoading] = useState(false);
   const [passwordLoading, setPasswordLoading] = useState(false);
-
 
   // Fetch website information on mount
   useEffect(() => {
@@ -44,6 +49,12 @@ const Settings = () => {
             logoPreview: data.logoUrl || "",
             contactNumber1: data.contactNumber1 || "",
             contactNumber2: data.contactNumber2 || "",
+            email: data.email || "",
+            address: data.address || "",
+            facebookUrl: data.facebookUrl || "",
+            twitterUrl: data.twitterUrl || "",
+            instagramUrl: data.instagramUrl || "",
+            openingHours: data.openingHours || "",
           });
         }
       } catch (error) {
@@ -77,6 +88,12 @@ const Settings = () => {
           logoUrl,
           contactNumber1: websiteInfo.contactNumber1,
           contactNumber2: websiteInfo.contactNumber2,
+          email: websiteInfo.email,
+          address: websiteInfo.address,
+          facebookUrl: websiteInfo.facebookUrl,
+          twitterUrl: websiteInfo.twitterUrl,
+          instagramUrl: websiteInfo.instagramUrl,
+          openingHours: websiteInfo.openingHours,
         },
         { merge: true }
       );
@@ -227,41 +244,170 @@ const Settings = () => {
                 )}
               </div>
 
-              {/* Contact Numbers */}
+              {/* Contact Information Grid */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* Contact Numbers */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Whatsapp Number
+                  </label>
+                  <input
+                    type="tel"
+                    required
+                    value={websiteInfo.contactNumber1}
+                    onChange={(e) =>
+                      setWebsiteInfo((prev) => ({
+                        ...prev,
+                        contactNumber1: e.target.value,
+                      }))
+                    }
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Contact Number 
+                  </label>
+                  <input
+                    type="tel"
+                    required
+                    value={websiteInfo.contactNumber2}
+                    onChange={(e) =>
+                      setWebsiteInfo((prev) => ({
+                        ...prev,
+                        contactNumber2: e.target.value,
+                      }))
+                    }
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  />
+                </div>
+              </div>
+
+              {/* Email Address */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Contact Number 1
+                  Email Address
                 </label>
                 <input
-                  type="tel"
+                  type="email"
                   required
-                  value={websiteInfo.contactNumber1}
+                  value={websiteInfo.email}
                   onChange={(e) =>
                     setWebsiteInfo((prev) => ({
                       ...prev,
-                      contactNumber1: e.target.value,
+                      email: e.target.value,
                     }))
                   }
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  placeholder="your@email.com"
                 />
               </div>
 
+              {/* Address */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Contact Number 2
+                  Business Address
                 </label>
-                <input
-                  type="tel"
+                <textarea
+                  rows={3}
                   required
-                  value={websiteInfo.contactNumber2}
+                  value={websiteInfo.address}
                   onChange={(e) =>
                     setWebsiteInfo((prev) => ({
                       ...prev,
-                      contactNumber2: e.target.value,
+                      address: e.target.value,
                     }))
                   }
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  placeholder="Enter your complete business address"
                 />
+                <p className="text-xs text-gray-500 mt-1">
+                  Include street address, city, state, and postal code
+                </p>
+              </div>
+
+              {/* Social Media Links */}
+              <div>
+                <h3 className="text-lg font-medium text-gray-900 mb-4">Social Media Links</h3>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Facebook URL
+                    </label>
+                    <input
+                      type="url"
+                      value={websiteInfo.facebookUrl}
+                      onChange={(e) =>
+                        setWebsiteInfo((prev) => ({
+                          ...prev,
+                          facebookUrl: e.target.value,
+                        }))
+                      }
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      placeholder="https://facebook.com/yourpage"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Twitter URL
+                    </label>
+                    <input
+                      type="url"
+                      value={websiteInfo.twitterUrl}
+                      onChange={(e) =>
+                        setWebsiteInfo((prev) => ({
+                          ...prev,
+                          twitterUrl: e.target.value,
+                        }))
+                      }
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      placeholder="https://twitter.com/yourhandle"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Instagram URL
+                    </label>
+                    <input
+                      type="url"
+                      value={websiteInfo.instagramUrl}
+                      onChange={(e) =>
+                        setWebsiteInfo((prev) => ({
+                          ...prev,
+                          instagramUrl: e.target.value,
+                        }))
+                      }
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      placeholder="https://instagram.com/yourhandle"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Opening Hours */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Opening Hours
+                </label>
+                <textarea
+                  rows={3}
+                  required
+                  value={websiteInfo.openingHours}
+                  onChange={(e) =>
+                    setWebsiteInfo((prev) => ({
+                      ...prev,
+                      openingHours: e.target.value,
+                    }))
+                  }
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  placeholder="Monday to Sunday, 10:00 AM – 3:00 PM"
+                />
+                <p className="text-xs text-gray-500 mt-1">
+                  Describe your business hours and availability
+                </p>
               </div>
 
               <button

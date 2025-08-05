@@ -9,8 +9,33 @@ import {
 } from "react-icons/fa";
 import { Link } from "react-router";
 import { FooterBg } from "../../assets";
+import { useEffect, useState } from "react";
+import { doc, getDoc } from "firebase/firestore";
+import { db } from "../../Firebase";
 
 const Footer = () => {
+  const [information, setInformation] = useState({});
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        // Fetch contact number
+        const docRef = doc(db, "websiteInformation", "siteConfig");
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) {
+          const data = docSnap.data();
+          setInformation(data);
+        } else {
+          console.warn("No such document: siteConfig");
+        }
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+    fetchData();
+  }, []);
+  console.log(information);
+
   return (
     <div
       className="relative w-full bg-cover"
@@ -27,16 +52,32 @@ const Footer = () => {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 py-20 px-6 md:px-20">
           {/* Column 1 - Logo & Social */}
           <div className="flex flex-col gap-3">
-            <h3 className="text-2xl font-semibold mb-4">Logo</h3>
+            {/* Logo */}
+            <Link to={"/"}>
+              <img
+                src={information.logoUrl || "./website_logo.PNG"}
+                className="w-14 mb-1"
+                alt="Website Logo"
+              />
+            </Link>
             <p className="text-base mb-4">
               Your premium destination for massage, companionship, and ultimate
               relaxation.
             </p>
             <div className="flex gap-6">
-              <FaWhatsapp className="text-xl " />
-              <FaFacebookF className="text-xl " />
-              <FaTwitter className="text-xl" />
-              <FaInstagram className="text-xl" />
+              <Link to={information.contactNumber1}>
+                <FaWhatsapp className="text-xl " />
+              </Link>
+              <Link to={information.facebookUrl}>
+                <FaFacebookF className="text-xl " />
+              </Link>
+              <Link to={information.twitterUrl}>
+                <FaTwitter className="text-xl" />
+              </Link>
+              <Link to={information.instagramUrl}>
+                {" "}
+                <FaInstagram className="text-xl" />
+              </Link>
             </div>
           </div>
 
@@ -67,14 +108,13 @@ const Footer = () => {
             <h3 className="text-xl font-semibold mb-4">Contact Us</h3>
             <ul className="space-y-3 text-base">
               <li className="flex items-center gap-4">
-                <FaPhoneAlt /> 011 40363064
+                <FaPhoneAlt /> {information.contactNumber2}
               </li>
               <li className="flex items-center gap-4">
-                <FaEnvelope /> Amit@caavm.com
+                <FaEnvelope /> {information.email}
               </li>
               <li className="flex items-center gap-5">
-                <FaMapMarkerAlt size={20} /> 1st Floor,276, Gagan Vihar Delhi
-                110051, India
+                <FaMapMarkerAlt size={20} /> {information.address}
               </li>
             </ul>
           </div>
@@ -83,7 +123,7 @@ const Footer = () => {
           <div className="flex flex-col gap-3">
             <h3 className="text-xl font-semibold mb-4">Open Hours</h3>
             <p className="text-base">
-              We are available Monday to Sunday, 10:00 AM – 3:00 PM.
+              We are available {information.openingHours}
             </p>
           </div>
         </div>

@@ -1,5 +1,14 @@
 import { useState } from "react";
-import { FiHome, FiCalendar, FiUsers, FiSettings, FiMenu, FiX, FiLogOut } from "react-icons/fi";
+import {
+  FiHome,
+  FiCalendar,
+  FiUsers,
+  FiSettings,
+  FiMenu,
+  FiX,
+  FiLogOut,
+  FiGrid,
+} from "react-icons/fi";
 import { Link, useLocation } from "react-router";
 import { useAuth } from "../../../contexts/AuthContext";
 
@@ -9,9 +18,10 @@ const Sidebar = () => {
   const { logout } = useAuth();
 
   const menuItems = [
-   // { path: "admin/dashboard", icon: FiHome, label: "Dashboard" },
+    // { path: "admin/dashboard", icon: FiHome, label: "Dashboard" },
     { path: "admin/bookings", icon: FiCalendar, label: "Bookings" },
     { path: "admin/profiles", icon: FiUsers, label: "Girls Profiles" },
+    { path: "admin/plans", icon: FiGrid, label: "Plans Creation" },
     { path: "admin/settings", icon: FiSettings, label: "Settings" },
   ];
 
@@ -35,7 +45,12 @@ const Sidebar = () => {
       </button>
 
       {/* Overlay for mobile */}
-      {isOpen && <div className="lg:hidden fixed inset-0 bg-black/50 z-40" onClick={toggleSidebar} />}
+      {isOpen && (
+        <div
+          className="lg:hidden fixed inset-0 bg-black/50 z-40"
+          onClick={toggleSidebar}
+        />
+      )}
 
       {/* Sidebar */}
       <div
@@ -45,7 +60,9 @@ const Sidebar = () => {
       `}
       >
         <div className="p-6 flex flex-col h-full">
-          <h1 className="text-2xl font-bold text-gray-800 mb-8">Booking Admin</h1>
+          <h1 className="text-2xl font-bold text-gray-800 mb-8">
+            Admin Panel
+          </h1>
 
           <nav className="space-y-2 flex-1">
             {menuItems.map((item) => {

@@ -13,7 +13,7 @@ import Profile from "./pages/Profile.jsx";
 import TermsAndCond from "./pages/TermsAndCond.jsx";
 
 // Admin pages
-import Dashboard from "./pages/admin/pages/Dashboard.jsx";
+//import Dashboard from "./pages/admin/pages/Dashboard.jsx";
 import AdminBookings from "./pages/admin/pages/Bookings.jsx";
 import GirlsProfiles from "./pages/admin/pages/GirlsProfiles.jsx";
 import Settings from "./pages/admin/pages/Settings.jsx";
@@ -23,6 +23,7 @@ import ScrollToTop from "./components/layout/ScrollToTop.jsx";
 import AdminLogin from "./pages/AdminLogin.jsx";
 import { AuthProvider } from "./contexts/AuthContext.jsx";
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
+import PlansCreation from "./pages/admin/pages/PlansCreation.jsx";
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
@@ -62,6 +63,14 @@ createRoot(document.getElementById("root")).render(
               element={
                 <ProtectedRoute>
                   <GirlsProfiles />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="admin/plans"
+              element={
+                <ProtectedRoute>
+                  <PlansCreation />
                 </ProtectedRoute>
               }
             />

@@ -32,13 +32,13 @@ const Table = ({
         <tbody>
           {dataSource.map((row, rowIndex) => (
             <tr
-              key={row.key || rowIndex}
+              key={row.id || rowIndex}
               className={"bg-[var(--white-color)]/10"}
             >
               {columns.map((col) => {
                 const cellContent = col.render
-                  ? col.render(row[col.dataIndex], row, rowIndex)
-                  : row[col.dataIndex];
+                  ? col.render(row[col.key], row, rowIndex)
+                  : row[col.key];
 
                 return (
                   <td

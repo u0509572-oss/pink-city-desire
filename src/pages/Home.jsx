@@ -36,7 +36,7 @@ import {
 } from "firebase/firestore";
 import { db } from "../Firebase";
 
-// Fallback data - will be used if Firebase collection is empty or fails to load
+// Fallback data for girls profiles
 const fallbackData = [
   {
     imgurl: DummyImg1,
@@ -55,111 +55,144 @@ const fallbackData = [
   },
 ];
 
-const columns = [
-  {
-    title: "Jaipur Call Girl Near Me",
-    dataIndex: "title",
-    key: "title",
-    width: "26%",
-  },
-  {
-    title: "2 Hours",
-    dataIndex: "rate1",
-    key: "rate1",
-    width: "18%",
-  },
-  {
-    title: "4 Hours",
-    dataIndex: "rate2",
-    key: "rate2",
-    width: "18%",
-  },
-  {
-    title: "Full Night",
-    dataIndex: "rate3",
-    key: "rate3",
-    width: "18%",
-  },
-  {
-    title: "CTA",
-    dataIndex: "cta",
-    key: "cta",
-    width: "20%",
-  },
-];
-
 const Home = () => {
   const navigate = useNavigate();
   const [contactNumber, setContactNumber] = useState("");
   const [modelsData, setModelsData] = useState(fallbackData);
   const [loading, setLoading] = useState(true);
+  const [columns, setColumns] = useState([]);
+  const [plans, setPlans] = useState([]);
+  const [plansLoading, setPlansLoading] = useState(true);
 
-  const dataSource = [
-    {
-      key: "1",
-      title: "Russian Call Girl Jaipur",
-      rate1: "₹ 5000",
-      rate2: "₹ 12000",
-      rate3: "₹ 25000",
-      cta: (
-        <Button
-          children={"Book Now"}
-          onClick={() => {
-            navigate("/booking");
-          }}
-          className="!py-1.5"
-        ></Button>
-      ),
-    },
-    {
-      key: "2",
-      title: "Russian Call Girl Jaipur",
-      rate1: "₹ 5000",
-      rate2: "₹ 12000",
-      rate3: "₹ 25000",
-      cta: (
-        <Button
-          children={"Book Now"}
-          onClick={() => {
-            navigate("/booking");
-          }}
-          className="!py-1.5"
-        ></Button>
-      ),
-    },
-    {
-      key: "3",
-      title: "Russian Call Girl Jaipur",
-      rate1: "₹ 5000",
-      rate2: "₹ 12000",
-      rate3: "₹ 25000",
-      cta: (
-        <Button
-          children={"Book Now"}
-          onClick={() => {
-            navigate("/booking");
-          }}
-          className="!py-1.5"
-        ></Button>
-      ),
-    },
-    {
-      key: "4",
-      title: "Russian Call Girl Jaipur",
-      rate1: "₹ 5000",
-      rate2: "₹ 12000",
-      rate3: "₹ 25000",
-      cta: (
-        <Button
-          children={"Book Now"}
-          onClick={() => {
-            navigate("/booking");
-          }}
-          className="!py-1.5"
-        ></Button>
-      ),
-    },
-  ];
+  // Firebase collections
+  const plansCollection = collection(db, "plans");
+  const columnsCollection = collection(db, "planColumns");
+
+  // Fetch columns from Firebase
+  const fetchColumns = async () => {
+    try {
+      const columnsQuery = query(columnsCollection, orderBy("createdAt", "asc"));
+      const snapshot = await getDocs(columnsQuery);
+      const columnsData = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+      setColumns(columnsData);
+    } catch (error) {
+      console.error("Error fetching columns:", error);
+      // Fallback columns in case of error
+      setColumns([
+        {
+          id: "fallback1",
+          title: "Jaipur Call Girl Near Me",
+          dataIndex: "title",
+          type: "text",
+        },
+        {
+          id: "fallback2",
+          title: "2 Hours",
+          dataIndex: "rate1",
+          type: "text",
+        },
+        {
+          id: "fallback3",
+          title: "4 Hours",
+          dataIndex: "rate2",
+          type: "text",
+        },
+        {
+          id: "fallback4",
+          title: "Full Night",
+          dataIndex: "rate3",
+          type: "text",
+        },
+        {
+          id: "fallback5",
+          title: "CTA",
+          dataIndex: "cta",
+          type: "button",
+        },
+      ]);
+    }
+  };
+
+  // Fetch plans from Firebase
+  const fetchPlans = async () => {
+    try {
+      setPlansLoading(true);
+      const plansQuery = query(plansCollection, orderBy("createdAt", "desc"));
+      const snapshot = await getDocs(plansQuery);
+      const plansData = snapshot.docs.map((doc) => {
+        const data = doc.data();
+        return {
+          id: doc.id,
+          title: data.title,
+          rate1: data.rate1,
+          rate2: data.rate2,
+          rate3: data.rate3,
+          cta: (
+            <Button
+              children={data.cta?.props?.children || "Book Now"}
+              onClick={() => navigate("/booking")}
+              className={data.cta?.props?.className || "!py-1.5"}
+            />
+          ),
+        };
+      });
+      setPlans(plansData);
+      setPlansLoading(false);
+    } catch (error) {
+      console.error("Error fetching plans:", error);
+      setPlansLoading(false);
+      // Fallback plans in case of error
+      setPlans([
+        {
+          id: "fallback1",
+          title: "Russian Call Girl Jaipur",
+          rate1: "₹ 5000",
+          rate2: "₹ 12000",
+          rate3: "₹ 25000",
+          cta: (
+            <Button
+              children={"Book Now"}
+              onClick={() => navigate("/booking")}
+              className="!py-1.5"
+            />
+          ),
+        },
+      ]);
+    }
+  };
+
+  // UseEffect to fetch columns and plans data
+  useEffect(() => {
+    fetchColumns();
+    fetchPlans();
+  }, []);
+  // Generate table columns for display
+  const generateTableColumns = () => {
+    const tableColumns = columns.map((col) => {
+      if (col.type === "button") {
+        return {
+          key: col.dataIndex,
+          title: col.title,
+          render: (plan) => (
+            <Button
+              children={"Book Now"}
+              onClick={() => navigate("/booking")}
+              className="!py-1.5"
+            />
+          ),
+        }
+      }
+      return {
+        key: col.dataIndex,
+        title: col.title,
+      }
+    })
+
+    return tableColumns
+  }
 
   // Fetch contact number and models data from Firestore
   useEffect(() => {
@@ -187,34 +220,21 @@ const Home = () => {
         const girlsSnapshot = await getDocs(girlsQuery);
 
         if (!girlsSnapshot.empty) {
-          const girlsData = [];
-          girlsSnapshot.forEach((doc) => {
+          const girlsData = girlsSnapshot.docs.map((doc) => {
             const data = doc.data();
-            girlsData.push({
+            return {
               id: doc.id,
               imgurl: data.imageUrl || DummyImg1,
               name: data.name || "Unknown",
               details: data.description || "Professional Escort Service",
-              // Include additional fields that might be useful
-              // age: data.age,
-              // location: data.location,
-              // services: data.services,
-              // rates: data.rates,
-              // ...data
-            });
+            };
           });
-
-          // console.log(`Fetched ${girlsData.length} profiles from Firebase`);
           setModelsData(girlsData);
         } else {
-          console.log(
-            "No girls profiles found in Firebase, using fallback data"
-          );
-          // Keep fallback data that was already set in useState
+          console.log("No girls profiles found in Firebase, using fallback data");
         }
       } catch (error) {
         console.error("Error fetching data:", error);
-        // Keep fallback data in case of error
       } finally {
         setLoading(false);
       }
@@ -236,14 +256,9 @@ const Home = () => {
           className="absolute right-5 bottom-5 md:right-10 md:bottom-10 cursor-pointer"
           onClick={() => {
             if (contactNumber) {
-              const formattedNumber = contactNumber.replace(/\D/g, ""); // Remove non-digit characters
-              const message = encodeURIComponent(
-                "Hi, I want to book a service."
-              );
-              window.open(
-                `https://wa.me/${formattedNumber}?text=${message}`,
-                "_blank"
-              );
+              const formattedNumber = contactNumber.replace(/\D/g, "");
+              const message = encodeURIComponent("Hi, I want to book a service.");
+              window.open(`https://wa.me/${formattedNumber}?text=${message}`, "_blank");
             } else {
               console.warn("Contact number not loaded yet.");
             }
@@ -290,15 +305,11 @@ const Home = () => {
                     children="View girl's Gallery"
                     bgColor="bg-[var(--black-color)]"
                     className="border"
-                    onClick={() => {
-                      navigate("/gallery");
-                    }}
+                    onClick={() => navigate("/gallery")}
                   />
                   <Button
                     children={"Book Now"}
-                    onClick={() => {
-                      navigate("/booking");
-                    }}
+                    onClick={() => navigate("/booking")}
                   />
                 </div>
               </div>
@@ -380,14 +391,9 @@ const Home = () => {
                   className="border !md:text-xl"
                   onClick={() => {
                     if (contactNumber) {
-                      const formattedNumber = contactNumber.replace(/\D/g, ""); // Remove non-digit characters
-                      const message = encodeURIComponent(
-                        "Hi, I want to book a service."
-                      );
-                      window.open(
-                        `https://wa.me/${formattedNumber}?text=${message}`,
-                        "_blank"
-                      );
+                      const formattedNumber = contactNumber.replace(/\D/g, "");
+                      const message = encodeURIComponent("Hi, I want to book a service.");
+                      window.open(`https://wa.me/${formattedNumber}?text=${message}`, "_blank");
                     } else {
                       console.warn("Contact number not loaded yet.");
                     }
@@ -395,10 +401,8 @@ const Home = () => {
                 />
                 <Button
                   children={"Book Safely"}
-                  className=" !md:text-xl !md:px-10"
-                  onClick={() => {
-                    navigate("/booking");
-                  }}
+                  className="!md:text-xl !md:px-10"
+                  onClick={() => navigate("/booking")}
                 />
               </div>
             </div>
@@ -415,7 +419,7 @@ const Home = () => {
         <div className="relative text-white section-container">
           <Container>
             <div className="flex flex-col gap-8 md:gap-14 items-center">
-              <div className="max-w-4xl flex flex-col items-center  gap-8 md:gap-14">
+              <div className="max-w-4xl flex flex-col items-center gap-8 md:gap-14">
                 <h2 className="text-center responsive-heading font-medium">
                   Discover the Hottest Female Escorts in Jaipur – 100% Real
                   Images & Fresh New Profiles
@@ -429,11 +433,21 @@ const Home = () => {
                   priority.
                 </p>
               </div>
-              <Table
-                className="w-full"
-                dataSource={dataSource}
-                columns={columns}
-              />
+              {plansLoading ? (
+                <div className="flex justify-center items-center py-10">
+                  <p className="text-white text-lg">Loading plans...</p>
+                </div>
+              ) : plans.length === 0 ? (
+                <div className="flex justify-center items-center py-10">
+                  <p className="text-white text-lg">No plans available at the moment.</p>
+                </div>
+              ) : (
+                <Table
+                  className="w-full"
+                  dataSource={plans}
+                  columns={generateTableColumns()}
+                />
+              )}
             </div>
           </Container>
         </div>
@@ -451,10 +465,8 @@ const Home = () => {
                 </h2>
                 <Button
                   children={"View All Gallery"}
-                  className=" !md:text-xl !md:px-10"
-                  onClick={() => {
-                    navigate("/gallery");
-                  }}
+                  className="!md:text-xl !md:px-10"
+                  onClick={() => navigate("/gallery")}
                 />
               </div>
             </div>
@@ -479,7 +491,6 @@ const Home = () => {
         style={{ backgroundImage: `url(${HomePage7Img})` }}
       >
         <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(0,0,0,0.64)_0%,rgba(201,68,208,0.8)_100%)] opacity-90"></div>
-
         <div className="relative section-container overflow-hidden">
           <Container>
             <div className="relative flex justify-between items-center lg:flex-row flex-col gap-10 md:gap-20">
@@ -515,7 +526,6 @@ const Home = () => {
           <div className="flex justify-between items-center lg:flex-row flex-col gap-10 md:gap-20">
             <div className="flex justify-center items-center w-full lg:w-1/2">
               <div className="relative w-full max-w-[20rem] lg:max-w-[30rem] aspect-square">
-                {/* <div className="flex justify-center w-1/2 items-center relative"> */}
                 <div
                   className="absolute inset-0 opacity-20 rounded-3xl -rotate-10 -left-4"
                   style={{ backgroundImage: `url(${HomePage8Img})` }}
@@ -525,7 +535,6 @@ const Home = () => {
                   className="absolute inset-0 w-full h-full object-cover rounded-3xl z-10"
                   alt="landing image"
                 />
-                {/* </div> */}
               </div>
             </div>
             <div className="flex flex-col justify-center items-center w-full lg:w-1/2 gap-6 md:gap-8 text-white">
