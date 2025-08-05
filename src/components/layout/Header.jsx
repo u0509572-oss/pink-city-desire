@@ -1,14 +1,15 @@
-import  { useState } from "react";
+import { useState, useEffect } from "react";
+import { doc, getDoc } from "firebase/firestore";
+
 import Button from "../common/Button";
 import Container from "../common/Container";
-import { Link, NavLink, useNavigate } from "react-router";
-import { useAuth } from "../../contexts/AuthContext";
+import { Link, NavLink } from "react-router";
+import { db } from "../../Firebase";
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const { isAdmin } = useAuth();
-  const navigate = useNavigate();
-  
+  const [logoUrl, setLogoUrl] = useState(""); 
+
   const navItems = [
     { label: "Home", path: "/" },
     { label: "Gallery", path: "/gallery" },
@@ -17,13 +18,25 @@ const Header = () => {
     { label: "Terms & 18+ Disclaimer Page", path: "/disclaimer" },
   ];
 
-  const handleAdminAction = () => {
-    if (isAdmin) {
-      navigate("admin/bookings");
-    } else {
-      navigate("/login");
-    }
-  };
+  // Fetch logo URL from Firestore
+  useEffect(() => {
+    const fetchLogo = async () => {
+      try {
+        const docRef = doc(db, "websiteInformation", "siteConfig");
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) {
+          const data = docSnap.data();
+          setLogoUrl(data.logoUrl);
+        } else {
+          console.warn("No such document: siteConfig");
+        }
+      } catch (error) {
+        console.error("Error fetching logo:", error);
+      }
+    };
+
+    fetchLogo();
+  }, []);
 
   return (
     <div className="bg-[var(--primary-color)]">
@@ -45,7 +58,11 @@ const Header = () => {
 
             {/* Logo */}
             <Link to={"/"}>
-              <img src="./website_logo.PNG" className="w-14 mb-1" alt="Website Logo" />
+              <img
+                src={logoUrl || "./website_logo.PNG"}
+                className="w-14 mb-1"
+                alt="Website Logo"
+              />
             </Link>
           </div>
 
@@ -74,12 +91,6 @@ const Header = () => {
               children={"Contact Us"}
               bgColor="bg-[var(--black-color)]"
               className="mb-2"
-            />
-            <Button
-              children={isAdmin ? "Dashboard" : "Admin Login"}
-              bgColor="bg-[var(--black-color)]"
-              className="mb-2"
-              onClick={handleAdminAction}
             />
           </div>
 

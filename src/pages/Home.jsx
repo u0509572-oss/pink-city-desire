@@ -24,8 +24,20 @@ import Carousel from "../components/LandingPage/Carousel";
 import FAQCollapse from "../components/LandingPage/FAQCollapse";
 import { useNavigate } from "react-router";
 import Footer from "../components/layout/Footer";
+import { useState, useEffect } from "react";
+import {
+  doc,
+  getDoc,
+  collection,
+  getDocs,
+  query,
+  orderBy,
+  limit,
+} from "firebase/firestore";
+import { db } from "../Firebase";
 
-const data = [
+// Fallback data - will be used if Firebase collection is empty or fails to load
+const fallbackData = [
   {
     imgurl: DummyImg1,
     name: "Alisa Chopra",
@@ -78,6 +90,10 @@ const columns = [
 
 const Home = () => {
   const navigate = useNavigate();
+  const [contactNumber, setContactNumber] = useState("");
+  const [modelsData, setModelsData] = useState(fallbackData);
+  const [loading, setLoading] = useState(true);
+
   const dataSource = [
     {
       key: "1",
@@ -144,6 +160,69 @@ const Home = () => {
       ),
     },
   ];
+
+  // Fetch contact number and models data from Firestore
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+
+        // Fetch contact number
+        const docRef = doc(db, "websiteInformation", "siteConfig");
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) {
+          const data = docSnap.data();
+          setContactNumber(data.contactNumber1);
+        } else {
+          console.warn("No such document: siteConfig");
+        }
+
+        // Fetch girls profiles
+        const girlsProfilesRef = collection(db, "girlsProfiles");
+        const girlsQuery = query(
+          girlsProfilesRef,
+          orderBy("createdAt", "desc"),
+          limit(3)
+        );
+        const girlsSnapshot = await getDocs(girlsQuery);
+
+        if (!girlsSnapshot.empty) {
+          const girlsData = [];
+          girlsSnapshot.forEach((doc) => {
+            const data = doc.data();
+            girlsData.push({
+              id: doc.id,
+              imgurl: data.imageUrl || DummyImg1,
+              name: data.name || "Unknown",
+              details: data.description || "Professional Escort Service",
+              // Include additional fields that might be useful
+              // age: data.age,
+              // location: data.location,
+              // services: data.services,
+              // rates: data.rates,
+              // ...data
+            });
+          });
+
+          // console.log(`Fetched ${girlsData.length} profiles from Firebase`);
+          setModelsData(girlsData);
+        } else {
+          console.log(
+            "No girls profiles found in Firebase, using fallback data"
+          );
+          // Keep fallback data that was already set in useState
+        }
+      } catch (error) {
+        console.error("Error fetching data:", error);
+        // Keep fallback data in case of error
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
   return (
     <section>
       {/* Landing Section */}
@@ -153,11 +232,27 @@ const Home = () => {
           className="w-full min-h-120 object-cover"
           alt="landing image"
         />
-        <button className="absolute right-5 bottom-5 md:right-10 md:bottom-10 cursor-pointer">
+        <button
+          className="absolute right-5 bottom-5 md:right-10 md:bottom-10 cursor-pointer"
+          onClick={() => {
+            if (contactNumber) {
+              const formattedNumber = contactNumber.replace(/\D/g, ""); // Remove non-digit characters
+              const message = encodeURIComponent(
+                "Hi, I want to book a service."
+              );
+              window.open(
+                `https://wa.me/${formattedNumber}?text=${message}`,
+                "_blank"
+              );
+            } else {
+              console.warn("Contact number not loaded yet.");
+            }
+          }}
+        >
           <img
             src={Whatsapp}
             className="w-8 md:w-12 lg:w-14 aspect-square"
-            alt="landing image"
+            alt="WhatsApp Icon"
           />
         </button>
       </div>
@@ -185,14 +280,14 @@ const Home = () => {
                   Arrival | Open 24x7
                 </h2>
                 <p className="responsive-paragraph">
-                  Discover Jaipur’s most exclusive and discreet companion
+                  Discover Jaipur's most exclusive and discreet companion
                   booking service. PinkCityDesires offers elite, elegant escorts
                   for upscale social, travel, and private engagements. Privacy
                   guaranteed.
                 </p>
                 <div className="flex gap-4">
                   <Button
-                    children="View girl’s Gallery"
+                    children="View girl's Gallery"
                     bgColor="bg-[var(--black-color)]"
                     className="border"
                     onClick={() => {
@@ -217,15 +312,21 @@ const Home = () => {
         <Container>
           <div className="flex justify-center">
             <h2 className="text-center max-w-5xl mb-8 md:mb-16 responsive-heading font-semibold">
-              Unforgettable One-Night Experience with Jaipur’s Finest Escorts –
+              Unforgettable One-Night Experience with Jaipur's Finest Escorts –
               Book Now
             </h2>
           </div>
-          <div className="flex gap-10 justify-center flex-wrap">
-            {data.map((card, i) => (
-              <Card key={i} {...card} />
-            ))}
-          </div>
+          {loading ? (
+            <div className="flex justify-center items-center py-10">
+              <p className="text-white text-lg">Loading models...</p>
+            </div>
+          ) : (
+            <div className="flex gap-10 justify-center flex-wrap">
+              {modelsData.slice(0, 6).map((card, i) => (
+                <Card key={card.id || i} {...card} number={contactNumber} />
+              ))}
+            </div>
+          )}
         </Container>
       </div>
 
@@ -239,7 +340,7 @@ const Home = () => {
           <Container>
             <div className="flex flex-col gap-8 md:gap-14 items-center">
               <h2 className="text-center max-w-5xl responsive-heading font-semibold">
-                Welcome to PinkCityDesires – Jaipur’s Most Trusted Elite
+                Welcome to PinkCityDesires – Jaipur's Most Trusted Elite
                 Companion Service
               </h2>
               <div>
@@ -256,7 +357,7 @@ const Home = () => {
                 </p>
                 <p className="responsive-paragraph text-center mb-4">
                   We understand that every gentleman has unique preferences and
-                  fantasies. That’s why our companions are selected for their
+                  fantasies. That's why our companions are selected for their
                   beauty, charm, intelligence, and ability to adapt to your
                   individual needs — whether it's a romantic dinner date, a
                   private evening, or a weekend escape.
@@ -277,6 +378,20 @@ const Home = () => {
                   }
                   bgColor="bg-[var(--black-color)]"
                   className="border !md:text-xl"
+                  onClick={() => {
+                    if (contactNumber) {
+                      const formattedNumber = contactNumber.replace(/\D/g, ""); // Remove non-digit characters
+                      const message = encodeURIComponent(
+                        "Hi, I want to book a service."
+                      );
+                      window.open(
+                        `https://wa.me/${formattedNumber}?text=${message}`,
+                        "_blank"
+                      );
+                    } else {
+                      console.warn("Contact number not loaded yet.");
+                    }
+                  }}
                 />
                 <Button
                   children={"Book Safely"}
@@ -343,11 +458,17 @@ const Home = () => {
                 />
               </div>
             </div>
-            <div className="flex gap-10 justify-center flex-wrap">
-              {data.map((card, i) => (
-                <GalleryCard key={i} {...card} />
-              ))}
-            </div>
+            {loading ? (
+              <div className="flex justify-center items-center py-10">
+                <p className="text-white text-lg">Loading gallery...</p>
+              </div>
+            ) : (
+              <div className="flex gap-10 justify-center flex-wrap">
+                {modelsData.slice(0, 6).map((card, i) => (
+                  <GalleryCard key={card.id || i} {...card} />
+                ))}
+              </div>
+            )}
           </Container>
         </div>
       </div>
